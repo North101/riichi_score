@@ -1,0 +1,13 @@
+name: riichi_score
+description: A Riichi Mahjong hand analyzer and scoring library for Dart. Calculates yaku, han, fu, and final score.
+version: 0.0.1
+repository: https://github.com/north101/riichi_score
+
+environment:
+  sdk: ^3.12.0-000.0.beta
+
+dependencies:
+
+dev_dependencies:
+  lints: ^6.1.0
+  test: ^1.30.0
