@@ -12,9 +12,6 @@ class Rules {
     // --- Limit Rules ---
     this.useKiriageMangan = constants.useKiriageMangan,
 
-    // --- Yakuman Rules ---
-    this.allowMultipleYakuman = true,
-
     // Some rule sets treat certain hands as double yakuman
     this.doubleYakumanHands = const {
       DoubleYakumanRule.suuankouTanki,
@@ -54,7 +51,6 @@ class Rules {
   // Yakuman Rules
   // =========================
 
-  final bool allowMultipleYakuman;
   final Set<DoubleYakumanRule> doubleYakumanHands;
 
   // =========================
