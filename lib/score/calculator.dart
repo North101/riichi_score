@@ -12,6 +12,7 @@ class ScoreCalculator {
     required int fu,
     bool useKiriageMangan = true,
   }) => switch (han) {
+    >= 26 => Limit.doubleYakuman,
     >= 13 => Limit.yakuman,
     >= 11 => Limit.sanbaiman,
     >= 8 => Limit.baiman,

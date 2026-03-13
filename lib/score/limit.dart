@@ -3,7 +3,8 @@ enum Limit {
   haneman(3000),
   baiman(4000),
   sanbaiman(6000),
-  yakuman(8000)
+  yakuman(8000),
+  doubleYakuman(16000)
   ;
 
   const Limit(this.points);
