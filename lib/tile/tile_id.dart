@@ -36,7 +36,11 @@ enum Wind {
   bool get isDealer => this == Wind.east;
 }
 
-enum Dragon { white, green, red }
+enum Dragon {
+  white,
+  green,
+  red, //
+}
 
 sealed class TileId with TileSymbol implements TileHelper, Comparable<TileId> {
   const TileId();

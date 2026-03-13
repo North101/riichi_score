@@ -105,9 +105,17 @@ void main() {
       );
 
       final breakdown = calculator.calculate(context);
-      expect(breakdown.items, contains(FuReason.closedRon));
-      expect(breakdown.items, contains(FuReason.tankiWait));
-      expect(breakdown.items, contains(FuReason.tripletTerminalClosed));
+      expect(
+        breakdown.items,
+        equals([
+          FuReason.base,
+          FuReason.closedRon,
+          FuReason.tripletTerminalClosed,
+          FuReason.valuePair,
+          FuReason.tankiWait,
+        ]),
+      );
+      expect(breakdown.value, equals(50));
     });
 
     test('dragon pair adds valuePair fu', () {
