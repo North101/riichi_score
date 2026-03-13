@@ -22,8 +22,7 @@ class FuCalculator {
     }
 
     if (structure is! StandardHand) {
-      return RoundedFuBreakdown.fromRules(
-        rules: context.rules,
+      return FixedFuBreakdown(
         items: const [],
         agari: agari,
       );
@@ -95,7 +94,7 @@ class FuCalculator {
 FuReason? _meldFu(MeldSequence meld) {
   final isClosed = meld.isClosed;
   if (meld case KanSequence(:final first)) {
-    if (first.isTerminal) {
+    if (first.isTerminalOrHonor) {
       return isClosed ? FuReason.kanTerminalClosed : FuReason.kanTerminalOpen;
     } else {
       return isClosed ? FuReason.kanSimpleClosed : FuReason.kanSimpleOpen;
@@ -103,7 +102,7 @@ FuReason? _meldFu(MeldSequence meld) {
   }
 
   if (meld case PonSequence(:final first)) {
-    if (first.isTerminal) {
+    if (first.isTerminalOrHonor) {
       return isClosed ? FuReason.tripletTerminalClosed : FuReason.tripletTerminalOpen;
     } else {
       return isClosed ? FuReason.tripletSimpleClosed : FuReason.tripletSimpleOpen;
