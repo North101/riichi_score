@@ -39,6 +39,7 @@ class MahjongAnalyzer {
       riichiPoints: context.rules.riichiPoints,
       honbaCount: context.round.honbaCount,
       honbaPoints: context.rules.honbaPoints,
+      maxLimit: han.isYakuman || context.rules.allowKazoeYakuman ? null : Limit.sanbaiman,
       useKiriageMangan: context.rules.useKiriageMangan,
     );
 

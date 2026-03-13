@@ -9,3 +9,4 @@ const nonDealerRonMultiplier = 4;
 const dealerTsumoMultiplier = 2;
 
 const useKiriageMangan = true;
+const allowKazoeYakuman = true;

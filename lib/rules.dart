@@ -11,6 +11,7 @@ class Rules {
   const Rules({
     // --- Limit Rules ---
     this.useKiriageMangan = constants.useKiriageMangan,
+    this.allowKazoeYakuman = constants.allowKazoeYakuman,
 
     // Some rule sets treat certain hands as double yakuman
     this.doubleYakumanHands = const {
@@ -46,6 +47,7 @@ class Rules {
   // =========================
 
   final bool useKiriageMangan;
+  final bool allowKazoeYakuman;
 
   // =========================
   // Yakuman Rules
