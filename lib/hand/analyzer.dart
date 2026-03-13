@@ -6,10 +6,15 @@ import 'structure.dart';
 extension on Map<TileId, List<Tile>> {
   Tile take(
     TileId id,
-    Tile winningTile,
-  ) {
+    Tile winningTile, {
+    required bool preferWinning,
+  }) {
     final tiles = this[id]!;
-    final index = tiles.indexWhere((t) => identical(t, winningTile));
+
+    final index = preferWinning
+        ? tiles.indexWhere((t) => identical(t, winningTile))
+        : tiles.indexWhere((t) => !identical(t, winningTile));
+
     return tiles.removeAt(index != -1 ? index : 0);
   }
 }
@@ -28,7 +33,7 @@ class HandAnalyzer {
     final counts = _buildCounts(tiles);
     final groups = _groupTiles(tiles);
 
-    final kokushi = _detectKokushi(hand, counts, groups);
+    final kokushi = _detectThirteenOrphans(hand, counts, groups);
     if (kokushi != null) yield kokushi;
 
     final chiitoi = _detectSevenPairs(hand, counts, groups);
@@ -98,7 +103,7 @@ class HandAnalyzer {
 
   static const _orphans = [0, 8, 9, 17, 18, 26, 27, 28, 29, 30, 31, 32, 33];
 
-  ThirteenOrphansHand? _detectKokushi(
+  ThirteenOrphansHand? _detectThirteenOrphans(
     Hand hand,
     List<int> counts,
     Map<TileId, List<Tile>> groups,
@@ -115,7 +120,9 @@ class HandAnalyzer {
     if (pairIndex == -1) return null;
 
     final singles = groups.values.where((e) => e.length == 1).map((e) => e.first);
-    final pair = PairSequence(tiles: groups.values.where((e) => e.length == 2).single);
+    final pair = PairSequence(
+      tiles: groups.values.where((e) => e.length == 2).single,
+    );
     return ThirteenOrphansHand(
       singles: singles,
       pair: pair,
@@ -141,56 +148,58 @@ class HandAnalyzer {
       final melds = <List<int>>[];
 
       for (final result in _searchMelds(working, melds, hand.revealed.length)) {
-        final tilePool = {
-          for (final e in groups.entries) e.key: [...e.value],
-        };
+        for (final pairPrefersWinning in const [true, false]) {
+          final tilePool = {
+            for (final e in groups.entries) e.key: [...e.value],
+          };
 
-        final pairId = TileId.byIndex[i];
+          final pairId = TileId.byIndex[i];
 
-        final pair = PairSequence(
-          tiles: [
-            tilePool.take(pairId, hand.winningTile),
-            tilePool.take(pairId, hand.winningTile),
-          ],
-        );
+          final pair = PairSequence(
+            tiles: [
+              tilePool.take(pairId, hand.winningTile, preferWinning: pairPrefersWinning),
+              tilePool.take(pairId, hand.winningTile, preferWinning: pairPrefersWinning),
+            ],
+          );
 
-        final meldSequences = <MeldSequence>[];
+          final meldSequences = <MeldSequence>[];
 
-        for (final meld in result) {
-          if (meld[0] == meld[1]) {
-            final id = TileId.byIndex[meld[0]];
+          for (final meld in result) {
+            if (meld[0] == meld[1]) {
+              final id = TileId.byIndex[meld[0]];
 
-            meldSequences.add(
-              ClosedPonSequence(
-                tiles: [
-                  tilePool.take(id, hand.winningTile),
-                  tilePool.take(id, hand.winningTile),
-                  tilePool.take(id, hand.winningTile),
-                ],
-              ),
-            );
-          } else {
-            final a = TileId.byIndex[meld[0]];
-            final b = TileId.byIndex[meld[1]];
-            final c = TileId.byIndex[meld[2]];
+              meldSequences.add(
+                ClosedPonSequence(
+                  tiles: [
+                    tilePool.take(id, hand.winningTile, preferWinning: !pairPrefersWinning),
+                    tilePool.take(id, hand.winningTile, preferWinning: !pairPrefersWinning),
+                    tilePool.take(id, hand.winningTile, preferWinning: !pairPrefersWinning),
+                  ],
+                ),
+              );
+            } else {
+              final a = TileId.byIndex[meld[0]];
+              final b = TileId.byIndex[meld[1]];
+              final c = TileId.byIndex[meld[2]];
 
-            meldSequences.add(
-              ClosedChiiSequence(
-                tiles: [
-                  tilePool.take(a, hand.winningTile) as Tile<SuitTileId>,
-                  tilePool.take(b, hand.winningTile) as Tile<SuitTileId>,
-                  tilePool.take(c, hand.winningTile) as Tile<SuitTileId>,
-                ],
-              ),
-            );
+              meldSequences.add(
+                ClosedChiiSequence(
+                  tiles: [
+                    tilePool.take(a, hand.winningTile, preferWinning: !pairPrefersWinning) as Tile<SuitTileId>,
+                    tilePool.take(b, hand.winningTile, preferWinning: !pairPrefersWinning) as Tile<SuitTileId>,
+                    tilePool.take(c, hand.winningTile, preferWinning: !pairPrefersWinning) as Tile<SuitTileId>,
+                  ],
+                ),
+              );
+            }
           }
-        }
 
-        yield StandardHand(
-          melds: [...hand.revealed, ...meldSequences],
-          pair: pair,
-          winningTile: hand.winningTile,
-        );
+          yield StandardHand(
+            melds: [...hand.revealed, ...meldSequences],
+            pair: pair,
+            winningTile: hand.winningTile,
+          );
+        }
       }
     }
   }
@@ -201,6 +210,7 @@ class HandAnalyzer {
     int revealed,
   ) sync* {
     final i = counts.indexWhere((c) => c > 0);
+
     if (i == -1) {
       if (revealed + melds.length == 4) yield List.from(melds);
       return;
