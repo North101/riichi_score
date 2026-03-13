@@ -68,23 +68,17 @@ class WaitAnalyzer {
       for (final meld in melds.whereType<ChiiSequence>()) {
         if (!meld.tiles.contains(winningTile)) continue;
 
-        final first = meld.tiles[0];
-        final second = meld.tiles[1];
-        final third = meld.tiles[2];
+        final first = meld.tiles[0].id.value;
+        final second = meld.tiles[1].id.value;
+        final third = meld.tiles[2].id.value;
 
-        // Ryanmen
-        if (value == first.id.value || value == third.id.value) {
+        if ((first == 1 && value == 3) || (third == 9 && value == 7)) {
+          waits.add(const Penchan());
+        } else if (value == first || value == third) {
           waits.add(const Ryanmen());
         }
-
-        // Kanchan
-        if (value == second.id.value) {
+        if (value == second) {
           waits.add(const Kanchan());
-        }
-
-        // Penchan
-        if ((first.id.value == 1 && value == 3) || (third.id.value == 9 && value == 7)) {
-          waits.add(const Penchan());
         }
       }
     }
@@ -98,15 +92,14 @@ class WaitAnalyzer {
     final winningTile = structure.winningTile;
     final pair = structure.pair;
     if (winningTile.id == pair.first.id) {
-      return const {KokushiMusoTanki()};
+      return const {KokushiMusoJusanmen()};
     }
-    return const {KokushiMusoJusanmen()};
+    return const {KokushiMusoTanki()};
   }
 
   Set<Wait> analyze(HandStructure structure) => switch (structure) {
     StandardHand() => analyzeStandardHand(structure),
     SevenPairsHand() => analyzeSevenPairsHand(structure),
-    ThirteenOrphansHand() =>
-      structure.winningTile.id == structure.pair.first.id ? const {KokushiMusoTanki()} : const {KokushiMusoJusanmen()},
+    ThirteenOrphansHand() => analyzeThirteenOrphansHand(structure),
   };
 }
